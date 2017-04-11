@@ -34,20 +34,17 @@ private:
   G4int trackID;
   G4int parentID;
   
-  //1XX= front detector with id XX 
-  //2XX= radial detector with id XX
-  //3XX= back detector with id XX  
   G4int detID;
   
-  G4double  preE; // total energy
-  G4double  preKE;// kinetic energy
+  G4double  postE; // total energy
+  G4double  postKE;// kinetic energy
   
-  G4double  prePosX; //position
-  G4double  prePosY;
-  G4double  prePosZ;
-  G4double  preMomX; //momentum
-  G4double  preMomY;
-  G4double  preMomZ;  
+  G4double  postPosX; //position
+  G4double  postPosY;
+  G4double  postPosZ;
+  G4double  postMomX; //momentum
+  G4double  postMomY;
+  G4double  postMomZ;  
 
 };
 
