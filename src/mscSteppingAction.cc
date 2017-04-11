@@ -32,15 +32,15 @@ void  mscSteppingAction::InitOutput(){
   tout->Branch("parentID",&parentID,"parentID/I");
   tout->Branch("detID",&detID,"detID/I");
   
-  tout->Branch("preE",&preE,"preE/D");
-  tout->Branch("preKE",&preKE,"preKE/D");
+  tout->Branch("postE",&postE,"postE/D");
+  tout->Branch("postKE",&postKE,"postKE/D");
   
-  tout->Branch("prePosX", &prePosX, "prePosX/D");
-  tout->Branch("prePosY", &prePosY, "prePosY/D");
-  tout->Branch("prePosZ", &prePosZ, "prePosZ/D");
-  tout->Branch("preMomX", &preMomX, "preMomX/D");
-  tout->Branch("preMomY", &preMomY, "preMomY/D");
-  tout->Branch("preMomZ", &preMomZ, "preMomZ/D");
+  tout->Branch("postPosX", &postPosX, "postPosX/D");
+  tout->Branch("postPosY", &postPosY, "postPosY/D");
+  tout->Branch("postPosZ", &postPosZ, "postPosZ/D");
+  tout->Branch("postMomX", &postMomX, "postMomX/D");
+  tout->Branch("postMomY", &postMomY, "postMomY/D");
+  tout->Branch("postMomZ", &postMomZ, "postMomZ/D");
   
 }
 
@@ -53,7 +53,6 @@ mscSteppingAction::~mscSteppingAction()
   fout->Close();
 }
 
-
 void mscSteppingAction::UserSteppingAction(const G4Step* theStep)
 {
   G4Track*              theTrack     = theStep->GetTrack();
@@ -64,61 +63,56 @@ void mscSteppingAction::UserSteppingAction(const G4Step* theStep)
 
   //get material
   G4Material* theMaterial = theTrack->GetMaterial();
-  G4ThreeVector _polarization=theTrack->GetPolarization();
-  G4String _pn=thePostPoint->GetProcessDefinedStep()->GetProcessName();
+  G4ThreeVector polarization=theTrack->GetPolarization();
+  G4String processNm = thePostPoint->GetProcessDefinedStep()->GetProcessName();
 
   InitVar();  
   
-  eventNr=*evNr;
+  eventNr = *evNr;
   if(currentEv!=eventNr){
     currentEv=eventNr;
   }
 
-  int fillTree=1;
+  int fillTree=0;
   
   if(theMaterial){    
-    if(theMaterial->GetName().compare("Galactic")==0)    material=1;
-    else if(theMaterial->GetName().compare("G4_W")==0 ||
+    if(theMaterial->GetName().compare("Galactic")==0){
+      fillTree=1;
+      material=1;
+    } else if(theMaterial->GetName().compare("G4_W")==0 ||
 	    theMaterial->GetName().compare("G4_Cu")==0 ||
+	    theMaterial->GetName().compare("matFe")==0 ||
+	    theMaterial->GetName().compare("matW")==0 ||
 	    theMaterial->GetName().compare("G4_Pb")==0){
       material=0;
       fillTree=0;
     }else fillTree=0;
 
     std::string volNm = thePrePoint->GetTouchableHandle()->GetVolume()->GetName();
-    if(volNm.compare(0,6,"detOut")==0){
-      detID = 200 + std::atoi(volNm.substr(7).c_str());
-    }else if(volNm.compare(0,11,"detUpStream")==0){
-      detID = 100 + std::atoi(volNm.substr(12).c_str());
-    }else if(volNm.compare(0,11,"detDnStream")==0){
-      detID = 300 + std::atoi(volNm.substr(12).c_str());
-    }
+    if(volNm.compare("radialDetector")==0)
+      detID = 0;
     
-    pType = particleType->GetPDGEncoding();    
+    pType = particleType->GetPDGEncoding();
+    if( abs(pType) != 11 && abs(pType) != 211 && pType != 111 && pType != 2112 && pType != 2212 )
+      fillTree=0;
     trackID = theStep->GetTrack()->GetTrackID();
     parentID = theStep->GetTrack()->GetParentID();
   
-    preE  =  thePrePoint->GetTotalEnergy();
-    preKE = thePostPoint->GetKineticEnergy();
+    postE  =  thePostPoint->GetTotalEnergy();
+    postKE = thePostPoint->GetKineticEnergy();
 
-    prePosX  =  thePrePoint->GetPosition().getX();
-    prePosY  =  thePrePoint->GetPosition().getY();
-    prePosZ  =  thePrePoint->GetPosition().getZ();
-    preMomX  =  thePrePoint->GetMomentum().getX();
-    preMomY  =  thePrePoint->GetMomentum().getY();
-    preMomZ  =  thePrePoint->GetMomentum().getZ();
+    postPosX  =  thePostPoint->GetPosition().getX();
+    postPosY  =  thePostPoint->GetPosition().getY();
+    postPosZ  =  thePostPoint->GetPosition().getZ();
+    postMomX  =  thePostPoint->GetMomentum().getX();
+    postMomY  =  thePostPoint->GetMomentum().getY();
+    postMomZ  =  thePostPoint->GetMomentum().getZ();
     
   }
 
   if(fillTree){
-    // G4cout<<" currentEv "<<eventNr
-    // 	  <<"  "<<theMaterial->GetName()<<" "<<particleType->GetPDGEncoding()
-    // 	  <<" "<<thePrePoint->GetTouchableHandle()->GetVolume()->GetName()
-    // 	  <<" "<<material<<G4endl;    
-    // G4cout<<detID<<G4endl;
     tout->Fill();
   }
-  
 }
 
 void mscSteppingAction::InitVar(){
@@ -129,15 +123,15 @@ void mscSteppingAction::InitVar(){
   parentID = -999;
   detID = -999;
   
-  preE  = -999;
-  preKE = -999;
+  postE  = -999;
+  postKE = -999;
 
-  prePosX  = -999;
-  prePosY  = -999;
-  prePosZ  = -999;
-  preMomX  = -999;
-  preMomY  = -999;
-  preMomZ  = -999;
+  postPosX  = -999;
+  postPosY  = -999;
+  postPosZ  = -999;
+  postMomX  = -999;
+  postMomY  = -999;
+  postMomZ  = -999;
 }
 
 
