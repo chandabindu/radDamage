@@ -16,7 +16,7 @@
 mscPrimaryGeneratorAction::mscPrimaryGeneratorAction()
  : G4VUserPrimaryGeneratorAction(),
    fParticleGun(0),
-   gunEnergy(1000.)
+   gunEnergy(11500.*MeV)
 {
   G4int nofParticles = 1;
   fParticleGun = new G4ParticleGun(nofParticles);
@@ -26,7 +26,7 @@ mscPrimaryGeneratorAction::mscPrimaryGeneratorAction()
     = G4ParticleTable::GetParticleTable()->FindParticle("e-");
   fParticleGun->SetParticleDefinition(particleDefinition);
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.));
-  fParticleGun->SetParticleEnergy(6000.*MeV);
+  fParticleGun->SetParticleEnergy(gunEnergy);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -42,7 +42,7 @@ void mscPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {  
 
   // Set gun position
-  fParticleGun->SetParticlePosition(G4ThreeVector(0., 0., - 8.*cm));
+  fParticleGun->SetParticlePosition(G4ThreeVector(0., 0., - 15.*cm));
 
   fParticleGun->GeneratePrimaryVertex(anEvent);
 }
