@@ -5,6 +5,7 @@
 #include "globals.hh"
 
 class G4Box;
+class G4Sphere;
 class G4VPhysicalVolume;
 class G4UniformMagField;
 class G4GenericMessenger;
