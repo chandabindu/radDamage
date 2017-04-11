@@ -25,6 +25,7 @@
 
 #include "G4Tubs.hh"
 #include "G4Box.hh"
+#include "G4Sphere.hh"
 
 #include "G4GeometryManager.hh"
 #include "G4SolidStore.hh"
@@ -38,7 +39,7 @@
 mscDetectorConstruction::mscDetectorConstruction()
  : G4VUserDetectorConstruction(),
    nrDet(40),
-   targetMaterial("copper"),
+   targetMaterial("tungsten"),
    fCheckOverlaps(true)
 {  
 }
@@ -65,9 +66,11 @@ G4VPhysicalVolume* mscDetectorConstruction::Construct()
   G4Material* vacuumMaterial=G4Material::GetMaterial("Galactic");
   G4Material* tgtMaterial;
   if( targetMaterial == "tungsten" )
-    tgtMaterial = G4Material::GetMaterial("G4_W");
+    tgtMaterial = G4Material::GetMaterial("matW");
   else if( targetMaterial == "lead" )
     tgtMaterial = G4Material::GetMaterial("G4_Pb");
+  else if( targetMaterial == "iron" )
+    tgtMaterial = G4Material::GetMaterial("matFe");
   else if( targetMaterial == "copper" )
     tgtMaterial = G4Material::GetMaterial("G4_Cu");
   else{
@@ -107,12 +110,15 @@ G4VPhysicalVolume* mscDetectorConstruction::Construct()
                  0,                // copy number
                  fCheckOverlaps);  // checking overlaps 
 
-  //Target
-  G4double tgtR = 5 * cm, tgtLen=15*cm;
+  //Target  
+  G4double tgtR = 300/2. * cm;
+  if( targetMaterial == "tungsten" )
+    tgtR = 150/2. * cm;
   G4VSolid* tgtS 
-    = new G4Tubs("targetS",           // its name
-                 0, tgtR, tgtLen/2., //inner R, outer R, length
-		 0*deg,360*deg);
+    = new G4Sphere("targetS",           // its name
+		   0, tgtR, //inner R, outer R,
+		   0*deg,360*deg, //phi Min, Max
+		   0*deg,180*deg);//theta Min, Max
   G4LogicalVolume* tgtL
     = new G4LogicalVolume(
                  tgtS,           // its solid
@@ -138,53 +144,32 @@ G4VPhysicalVolume* mscDetectorConstruction::Construct()
 
   ////// Radial detectors
   G4double detectorThickness = 0.01 * mm;
-  G4double spaceBetweenDet = 30*cm;
-  G4VSolid *detOutS[50];
-  G4LogicalVolume *detOutL[50];
+  G4double radialDetRadius = 3*m;
+  G4VSolid *radialDetS = new G4Sphere("radialDetS",
+				      radialDetRadius - detectorThickness/2,
+				      radialDetRadius + detectorThickness/2,
+				      0*deg,360*deg, //phi Min, Max
+				      0*deg,180*deg);//theta Min, Max
+				      
+  G4LogicalVolume* radialDetL
+    = new G4LogicalVolume(
+			  radialDetS,           // its solid
+			  vacuumMaterial,  // its material
+			  "targetL");         // its name
   G4Colour  red(255/255.,0/255.,0/255.);
   G4VisAttributes* detVisAtt = new G4VisAttributes(red);
+  detVisAtt->SetForceSolid(true);
   detVisAtt->SetVisibility(true);
-  for(G4int i=0;i<nrDet;i++){
-    G4double innerR = tgtR + spaceBetweenDet*i;
-    std::string solidNm = "detOutS_"+std::to_string(i);
-    detOutS[i] = new G4Tubs(solidNm.c_str(),
-			    innerR,innerR+detectorThickness,tgtLen/2.,
-			    0*deg,360*deg);
-    std::string logicNm = "detOutL_"+std::to_string(i);
-    detOutL[i] = new G4LogicalVolume(detOutS[i],vacuumMaterial,logicNm.c_str());
-    detOutL[i]->SetVisAttributes(detVisAtt);
-    std::string physNm = "detOut_"+std::to_string(i);
-    new G4PVPlacement(0,G4ThreeVector(),detOutL[i],physNm.c_str(),
-		      worldLV,false,0,fCheckOverlaps);
-  }
-
-  ////// Upstream/Downstream detectors
-  G4double spaceBetweenVertDet = 30*cm;
-  G4double vertDetR = 30*cm;
-  G4VSolid *detUS_S[50];
-  G4LogicalVolume *detUS_L[50];
-  G4RotationMatrix *rot1=new G4RotationMatrix(90*degree,0,0);
-  for(G4int i=0;i<nrDet;i++){
-    G4double zpos = - tgtLen/2. - spaceBetweenVertDet*(i+1);
-    std::string solidNm = "detUS_S_"+std::to_string(i);
-    detUS_S[i] = new G4Tubs(solidNm.c_str(),
-			    0,vertDetR,detectorThickness,
-			    0*deg,360*deg);
-    
-    std::string logicNm = "detUS_L_"+std::to_string(i);
-    detUS_L[i] = new G4LogicalVolume(detUS_S[i],vacuumMaterial,logicNm.c_str());
-    detUS_L[i]->SetVisAttributes(detVisAtt);
-    std::string physNm = "detUpStream_"+std::to_string(i);
-    new G4PVPlacement(rot1,G4ThreeVector(0,0,zpos),
-		      detUS_L[i],physNm.c_str(),
-		      worldLV,false,0,fCheckOverlaps);
-
-    physNm = "detDnStream_"+std::to_string(i);
-    new G4PVPlacement(rot1,G4ThreeVector(0,0,-zpos),
-		      detUS_L[i],physNm.c_str(),
-		      worldLV,false,0,fCheckOverlaps);
-  }
-
+  radialDetL->SetVisAttributes(detVisAtt);
+  new G4PVPlacement(
+		    0,                // no rotation
+		    G4ThreeVector(),  // at (0,0,0)
+		    radialDetL,       // its logical volume                         
+		    "radialDetector", // its name
+		    worldLV,          // its mother  volume
+		    false,            // no boolean operation
+		    0,                // copy number
+		    fCheckOverlaps);  // checking overlaps 
   
   
   return worldPV;
@@ -195,9 +180,6 @@ void mscDetectorConstruction::DefineMaterials()
 { 
 
   G4NistManager* nistManager = G4NistManager::Instance();
-  // G4Material* matPb = nistManager->FindOrBuildMaterial("G4_Pb");
-  // G4Material* matW  = nistManager->FindOrBuildMaterial("G4_W");
-  // G4Material* matCu = nistManager->FindOrBuildMaterial("G4_Cu");
   nistManager->FindOrBuildMaterial("G4_Pb");
   nistManager->FindOrBuildMaterial("G4_W");
   nistManager->FindOrBuildMaterial("G4_Cu");
@@ -214,6 +196,14 @@ void mscDetectorConstruction::DefineMaterials()
   matAir -> AddElement(elAr, fractionmass=0.0129);
   matAir -> AddElement(elH,  fractionmass=0.0008);
 
+  G4Element* elFe = nistManager->FindOrBuildElement("Fe");
+  G4Material *matFe = new G4Material("matFe",7.8*g/cm3,1);
+  matFe -> AddElement(elFe, fractionmass=1.);
+
+  G4Element* elW = nistManager->FindOrBuildElement("W");
+  G4Material *matW = new G4Material("matW",15.6*g/cm3,1);
+  matW -> AddElement(elW, fractionmass=1.);
+  
   // // Vacuum
   new G4Material("Galactic", 1., 1.01*g/mole, universe_mean_density,
 		 kStateGas, 2.73*kelvin, 3.e-18*pascal);
