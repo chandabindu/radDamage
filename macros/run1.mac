@@ -1,10 +1,10 @@
 ### 
-#/msc/setNrUnits 30
+#/rad/setNrUnits 30
 
 ## tungsten,lead,copper
-#/msc/det/setTargetmaterial tungsten
+#/rad/det/setTargetmaterial tungsten
 
-#/msc/gun/setGunEnergy 1 GeV
+#/rad/gun/setGunEnergy 1 GeV
 
-/msc/event/setPrintModulo 10000
-/run/beamOn 1000000
+/rad/event/setPrintModulo 1
+/run/beamOn 10
