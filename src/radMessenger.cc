@@ -31,6 +31,15 @@ radMessenger::radMessenger(){
     gunEnergyCmd = new G4UIcmdWithADoubleAndUnit("/rad/gun/setGunEnergy",this);
     gunEnergyCmd->SetParameterName("gunEnergy", false);
 
+    gunPosXCmd = new G4UIcmdWithADoubleAndUnit("/rad/gun/setGunPosX",this);
+    gunPosXCmd->SetParameterName("gunPosX", false);
+
+    gunPosYCmd = new G4UIcmdWithADoubleAndUnit("/rad/gun/setGunPosY",this);
+    gunPosYCmd->SetParameterName("gunPosY", false);
+
+    gunPosZCmd = new G4UIcmdWithADoubleAndUnit("/rad/gun/setGunPosZ",this);
+    gunPosZCmd->SetParameterName("gunPosZ", false);
+
     tgtMatCmd = new G4UIcmdWithAString("/rad/det/setTargetMaterial",this);
     tgtMatCmd->SetParameterName("tgtMat", false);
 
@@ -40,6 +49,9 @@ radMessenger::radMessenger(){
 radMessenger::~radMessenger(){
   if(nrDetCmd) delete nrDetCmd;
   if(gunEnergyCmd) delete gunEnergyCmd;
+  if(gunPosXCmd) delete gunPosXCmd;
+  if(gunPosYCmd) delete gunPosYCmd;
+  if(gunPosZCmd) delete gunPosZCmd;
   if(tgtMatCmd) delete tgtMatCmd;
   if(updateGeoCmd) delete updateGeoCmd;
 }
@@ -53,6 +65,15 @@ void radMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
   }else if( cmd == gunEnergyCmd ){
     G4double val = gunEnergyCmd->GetNewDoubleValue(newValue);
     fPriGen->SetGunEnergy( val );
+  }else if( cmd == gunPosXCmd ){
+    G4double val = gunPosXCmd->GetNewDoubleValue(newValue);
+    fPriGen->SetGunPosX( val );
+  }else if( cmd == gunPosYCmd ){
+    G4double val = gunPosYCmd->GetNewDoubleValue(newValue);
+    fPriGen->SetGunPosY( val );
+  }else if( cmd == gunPosZCmd ){
+    G4double val = gunPosZCmd->GetNewDoubleValue(newValue);
+    fPriGen->SetGunPosZ( val );
   }else if( cmd == tgtMatCmd ){
     fDetCon->SetTargetMaterial( newValue );
   }else if( cmd == updateGeoCmd ){

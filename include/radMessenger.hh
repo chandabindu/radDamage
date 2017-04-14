@@ -37,6 +37,9 @@ private:
   G4UIcmdWithAnInteger *nrDetCmd;
   G4UIcmdWithAString *tgtMatCmd;
   G4UIcmdWithADoubleAndUnit *gunEnergyCmd;
+  G4UIcmdWithADoubleAndUnit *gunPosXCmd;
+  G4UIcmdWithADoubleAndUnit *gunPosYCmd;
+  G4UIcmdWithADoubleAndUnit *gunPosZCmd;
   G4UIcmdWithoutParameter *updateGeoCmd;
   
 };

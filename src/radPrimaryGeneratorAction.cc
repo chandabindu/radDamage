@@ -16,7 +16,10 @@
 radPrimaryGeneratorAction::radPrimaryGeneratorAction()
  : G4VUserPrimaryGeneratorAction(),
    fParticleGun(0),
-   gunEnergy(1000.)
+   gunEnergy(1000.),
+   gunPosX(0),
+   gunPosY(0),
+   gunPosZ(0)   
 {
   G4int nofParticles = 1;
   fParticleGun = new G4ParticleGun(nofParticles);
@@ -26,7 +29,7 @@ radPrimaryGeneratorAction::radPrimaryGeneratorAction()
     = G4ParticleTable::GetParticleTable()->FindParticle("e-");
   fParticleGun->SetParticleDefinition(particleDefinition);
   fParticleGun->SetParticleMomentumDirection(G4ThreeVector(0.,0.,1.));
-  fParticleGun->SetParticleEnergy(6000.*MeV);
+  fParticleGun->SetParticleEnergy(gunEnergy);
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
@@ -42,7 +45,8 @@ void radPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {  
 
   // Set gun position
-  fParticleGun->SetParticlePosition(G4ThreeVector(0., 0., - 8.*cm));
+  fParticleGun->SetParticleEnergy(gunEnergy);
+  fParticleGun->SetParticlePosition(G4ThreeVector(gunPosX,gunPosY,gunPosZ));
 
   fParticleGun->GeneratePrimaryVertex(anEvent);
 }
