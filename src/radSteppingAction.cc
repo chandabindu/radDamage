@@ -1,4 +1,4 @@
-#include "mscSteppingAction.hh"
+#include "radSteppingAction.hh"
 
 #include "G4SteppingManager.hh"
 #include "G4Track.hh"
@@ -11,14 +11,14 @@
 
 #include <fstream>
 
-mscSteppingAction::mscSteppingAction(G4int *evN)
+radSteppingAction::radSteppingAction(G4int *evN)
 {
-  //eventID pointer from the mscEventAction.cc file
+  //eventID pointer from the radEventAction.cc file
   evNr=evN;
   InitOutput();
 }
 
-void  mscSteppingAction::InitOutput(){
+void  radSteppingAction::InitOutput(){
 
   /*Create root file and initialize what I want to put in it*/
   fout=new TFile("o_radTree.root","RECREATE");
@@ -48,7 +48,7 @@ void  mscSteppingAction::InitOutput(){
 }
 
 
-mscSteppingAction::~mscSteppingAction()
+radSteppingAction::~radSteppingAction()
 {
   /*Write out root file*/
   fout->cd();
@@ -56,7 +56,7 @@ mscSteppingAction::~mscSteppingAction()
   fout->Close();
 }
 
-void mscSteppingAction::UserSteppingAction(const G4Step* theStep)
+void radSteppingAction::UserSteppingAction(const G4Step* theStep)
 {
   G4Track*              theTrack     = theStep->GetTrack();
   G4ParticleDefinition* particleType = theTrack->GetDefinition();
@@ -130,7 +130,7 @@ void mscSteppingAction::UserSteppingAction(const G4Step* theStep)
   }
 }
 
-void mscSteppingAction::InitVar(){
+void radSteppingAction::InitVar(){
   eventNr = -999;
   material = -999;
   pType = -999;

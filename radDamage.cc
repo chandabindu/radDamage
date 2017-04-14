@@ -1,9 +1,9 @@
-#include "mscDetectorConstruction.hh"
-#include "mscPrimaryGeneratorAction.hh"
-#include "mscRunAction.hh"
-#include "mscEventAction.hh"
-#include "mscSteppingAction.hh"
-#include "mscMessenger.hh"
+#include "radDetectorConstruction.hh"
+#include "radPrimaryGeneratorAction.hh"
+#include "radRunAction.hh"
+#include "radEventAction.hh"
+#include "radSteppingAction.hh"
+#include "radMessenger.hh"
 
 #include "G4RunManager.hh"
 #include "G4UImanager.hh"
@@ -34,7 +34,7 @@
 namespace {
   void PrintUsage() {
     G4cerr << " Usage: " << G4endl;
-    G4cerr << " msc [-m macro ] [-u UIsession]" << G4endl;
+    G4cerr << " rad [-m macro ] [-u UIsession]" << G4endl;
   }
 }
 
@@ -68,13 +68,13 @@ int main(int argc,char** argv)
   // Construct the default run manager
   G4RunManager * runManager = new G4RunManager;
 
-  mscMessenger *mscMess = new mscMessenger();  
+  radMessenger *radMess = new radMessenger();  
   
   // Set mandatory initialization classes
   //
-  mscDetectorConstruction* detConstruction = new mscDetectorConstruction();
+  radDetectorConstruction* detConstruction = new radDetectorConstruction();
   runManager->SetUserInitialization(detConstruction);
-  mscMess->SetDetCon( detConstruction );
+  radMess->SetDetCon( detConstruction );
 
   // Calls a reference physics list for the simulation
   G4PhysListFactory factory;
@@ -91,17 +91,17 @@ int main(int argc,char** argv)
   G4int evNumber(0);
 
   // Set user action classes
-  mscPrimaryGeneratorAction *prigen=new mscPrimaryGeneratorAction();
+  radPrimaryGeneratorAction *prigen=new radPrimaryGeneratorAction();
   runManager->SetUserAction( prigen );
-  mscMess->SetPriGen(prigen);
+  radMess->SetPriGen(prigen);
   //
-  runManager->SetUserAction(new mscRunAction());
+  runManager->SetUserAction(new radRunAction());
   //
-  runManager->SetUserAction(new mscEventAction(&evNumber));
+  runManager->SetUserAction(new radEventAction(&evNumber));
   //
-  mscSteppingAction *stepAct=new mscSteppingAction(&evNumber);
+  radSteppingAction *stepAct=new radSteppingAction(&evNumber);
   runManager->SetUserAction(stepAct);
-  mscMess->SetStepAct(stepAct);
+  radMess->SetStepAct(stepAct);
 
   // Initialize G4 kernel
   //

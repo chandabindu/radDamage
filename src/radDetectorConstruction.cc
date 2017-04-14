@@ -1,4 +1,4 @@
-#include "mscDetectorConstruction.hh"
+#include "radDetectorConstruction.hh"
 
 #include "G4Material.hh"
 #include "G4NistManager.hh"
@@ -31,12 +31,14 @@
 #include "G4SolidStore.hh"
 #include "G4LogicalVolumeStore.hh"
 #include "G4PhysicalVolumeStore.hh"
- 
+#include "G4LogicalBorderSurface.hh"
+#include "G4LogicalSkinSurface.hh"
+
 #include <stdio.h>
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-mscDetectorConstruction::mscDetectorConstruction()
+radDetectorConstruction::radDetectorConstruction()
  : G4VUserDetectorConstruction(),
    nrDet(40),
    targetMaterial("tungsten"),
@@ -46,14 +48,28 @@ mscDetectorConstruction::mscDetectorConstruction()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-mscDetectorConstruction::~mscDetectorConstruction()
-{ 
+radDetectorConstruction::~radDetectorConstruction(){ 
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-G4VPhysicalVolume* mscDetectorConstruction::Construct()
-{
+void radDetectorConstruction::UpdateGeometry(){
+  // clean-up previous geometry
+  G4GeometryManager::GetInstance()->OpenGeometry();
+  G4PhysicalVolumeStore::GetInstance()->Clean();
+  G4LogicalVolumeStore::GetInstance()->Clean();
+  G4SolidStore::GetInstance()->Clean();
+  G4LogicalSkinSurface::CleanSurfaceTable();
+  G4LogicalBorderSurface::CleanSurfaceTable();
+  
+  //define new one
+  G4RunManager::GetRunManager()->DefineWorldVolume(Construct());
+  G4RunManager::GetRunManager()->GeometryHasBeenModified();
+}
+
+//....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
+
+G4VPhysicalVolume* radDetectorConstruction::Construct(){
   // Define materials 
   DefineMaterials();
 
@@ -176,7 +192,7 @@ G4VPhysicalVolume* mscDetectorConstruction::Construct()
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
-void mscDetectorConstruction::DefineMaterials()
+void radDetectorConstruction::DefineMaterials()
 { 
 
   G4NistManager* nistManager = G4NistManager::Instance();

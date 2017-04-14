@@ -1,4 +1,4 @@
-#include "mscPrimaryGeneratorAction.hh"
+#include "radPrimaryGeneratorAction.hh"
 
 #include "G4RunManager.hh"
 #include "G4LogicalVolumeStore.hh"
@@ -13,10 +13,13 @@
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-mscPrimaryGeneratorAction::mscPrimaryGeneratorAction()
+radPrimaryGeneratorAction::radPrimaryGeneratorAction()
  : G4VUserPrimaryGeneratorAction(),
    fParticleGun(0),
-   gunEnergy(11500.*MeV)
+   gunEnergy(1000.),
+   gunPosX(0),
+   gunPosY(0),
+   gunPosZ(0)   
 {
   G4int nofParticles = 1;
   fParticleGun = new G4ParticleGun(nofParticles);
@@ -31,18 +34,19 @@ mscPrimaryGeneratorAction::mscPrimaryGeneratorAction()
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-mscPrimaryGeneratorAction::~mscPrimaryGeneratorAction()
+radPrimaryGeneratorAction::~radPrimaryGeneratorAction()
 {
   delete fParticleGun;
 }
 
 //....oooOO0OOooo........oooOO0OOooo........oooOO0OOooo........oooOO0OOooo......
 
-void mscPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
+void radPrimaryGeneratorAction::GeneratePrimaries(G4Event* anEvent)
 {  
 
   // Set gun position
-  fParticleGun->SetParticlePosition(G4ThreeVector(0., 0., - 15.*cm));
+  fParticleGun->SetParticleEnergy(gunEnergy);
+  fParticleGun->SetParticlePosition(G4ThreeVector(gunPosX,gunPosY,gunPosZ));
 
   fParticleGun->GeneratePrimaryVertex(anEvent);
 }

@@ -1,5 +1,5 @@
-#ifndef mscSteppingAction_hh
-#define mscSteppingAction_hh 1
+#ifndef radSteppingAction_hh
+#define radSteppingAction_hh 1
 
 #include "G4UserSteppingAction.hh"
 #include "globals.hh"
@@ -10,11 +10,11 @@
 #include "TGraph.h"
 #include "neil.hh"
 
-class mscSteppingAction : public G4UserSteppingAction
+class radSteppingAction : public G4UserSteppingAction
 {
 public:
-  mscSteppingAction(G4int*);
-  ~mscSteppingAction();
+  radSteppingAction(G4int*);
+  ~radSteppingAction();
   
   void UserSteppingAction(const G4Step*);
   void InitVar();
