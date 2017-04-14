@@ -41,6 +41,9 @@ void  mscSteppingAction::InitOutput(){
   tout->Branch("preMomX", &preMomX, "preMomX/D");
   tout->Branch("preMomY", &preMomY, "preMomY/D");
   tout->Branch("preMomZ", &preMomZ, "preMomZ/D");
+
+  tout->Branch("neilVal", &neilVal, "neilVal/D");
+  tout->Branch("normCosAng", &normCosAng, "normCosAng/D");
   
 }
 
@@ -107,7 +110,19 @@ void mscSteppingAction::UserSteppingAction(const G4Step* theStep)
     preMomX  =  thePrePoint->GetMomentum().getX();
     preMomY  =  thePrePoint->GetMomentum().getY();
     preMomZ  =  thePrePoint->GetMomentum().getZ();
-    
+
+    int nDmg(-1);
+    if(pType == 11 || pType == -11) nDmg=3;
+    else if(pType == 2112) nDmg=0;
+    else if(pType == 2212) nDmg=1;
+    else if(pType == 211 || pType == -211 || pType == 111) nDmg=2; 
+
+    if(nDmg!=-1)
+      neilVal = neutronEquiv.getNEIL(nDmg,preE);
+
+    G4ThreeVector globalMomentum = thePrePoint->GetMomentum();
+    G4ThreeVector localMomentum = thePrePoint->GetTouchable()->GetHistory()->GetTopTransform().TransformPoint(globalMomentum);
+    normCosAng = cos(localMomentum.getTheta());
   }
 
   if(fillTree){
@@ -138,6 +153,10 @@ void mscSteppingAction::InitVar(){
   preMomX  = -999;
   preMomY  = -999;
   preMomZ  = -999;
+
+  neilVal  = -999;
+
+  normCosAng = -999;
 }
 
 

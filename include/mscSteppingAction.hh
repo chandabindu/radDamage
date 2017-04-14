@@ -8,7 +8,7 @@
 #include "TH3I.h"
 #include "TTree.h"
 #include "TGraph.h"
-
+#include "neil.hh"
 
 class mscSteppingAction : public G4UserSteppingAction
 {
@@ -48,7 +48,10 @@ private:
   G4double  preMomX; //momentum
   G4double  preMomY;
   G4double  preMomZ;  
-
+  G4double  neilVal;
+  G4double  normCosAng;
+  
+  neil neutronEquiv;
 };
 
 #endif
