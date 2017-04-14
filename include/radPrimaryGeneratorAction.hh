@@ -1,5 +1,5 @@
-#ifndef mscPrimaryGeneratorAction_h
-#define mscPrimaryGeneratorAction_h 1
+#ifndef radPrimaryGeneratorAction_h
+#define radPrimaryGeneratorAction_h 1
 
 #include "G4VUserPrimaryGeneratorAction.hh"
 #include "globals.hh"
@@ -7,11 +7,11 @@
 class G4ParticleGun;
 class G4Event;
 
-class mscPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
+class radPrimaryGeneratorAction : public G4VUserPrimaryGeneratorAction
 {
 public:
-  mscPrimaryGeneratorAction();    
-  virtual ~mscPrimaryGeneratorAction();
+  radPrimaryGeneratorAction();    
+  virtual ~radPrimaryGeneratorAction();
 
   virtual void GeneratePrimaries(G4Event* event);
   void SetGunEnergy(G4double val){gunEnergy=val;}

@@ -1,16 +1,16 @@
-#ifndef mscEventAction_h
-#define mscEventAction_h 1
+#ifndef radEventAction_h
+#define radEventAction_h 1
 
 #include "G4UserEventAction.hh"
 #include "globals.hh"
 
 class G4GenericMessenger;
 
-class mscEventAction : public G4UserEventAction
+class radEventAction : public G4UserEventAction
 {
 public:
-  mscEventAction(G4int *evN);
-  virtual ~mscEventAction();
+  radEventAction(G4int *evN);
+  virtual ~radEventAction();
 
   virtual void  BeginOfEventAction(const G4Event* event);
   virtual void    EndOfEventAction(const G4Event* event);
@@ -28,7 +28,7 @@ private:
 
 // inline functions
 
-inline void mscEventAction::SetPrintModulo(G4int value) {
+inline void radEventAction::SetPrintModulo(G4int value) {
   fPrintModulo = value;
 }
                      

@@ -1,21 +1,21 @@
-#include "mscMessenger.hh"
+#include "radMessenger.hh"
 
 #include "G4UIcmdWithAnInteger.hh"
 #include "G4UIcmdWithAString.hh"
 #include "G4UIcmdWithADoubleAndUnit.hh"
 #include "G4UIcmdWithABool.hh"
 
-#include "mscDetectorConstruction.hh"
-#include "mscEventAction.hh"
-#include "mscPrimaryGeneratorAction.hh"
-#include "mscSteppingAction.hh"
+#include "radDetectorConstruction.hh"
+#include "radEventAction.hh"
+#include "radPrimaryGeneratorAction.hh"
+#include "radSteppingAction.hh"
 
 #include "G4UImanager.hh"
 #include "G4RunManager.hh"
 
 #include <iostream>
 
-mscMessenger::mscMessenger(){
+radMessenger::radMessenger(){
     /*  Initialize all the things it talks to to NULL */
 
     fDetCon       = NULL;
@@ -23,26 +23,26 @@ mscMessenger::mscMessenger(){
     fPriGen       = NULL;
     fStepAct      = NULL;
 
-    nrDetCmd = new G4UIcmdWithAnInteger("/msc/det/setNrRadialDetectors",this);
+    nrDetCmd = new G4UIcmdWithAnInteger("/rad/det/setNrRadialDetectors",this);
     nrDetCmd->SetGuidance("Set number of detectors in radial direction");
     nrDetCmd->SetParameterName("nrDet", false);
 
-    gunEnergyCmd = new G4UIcmdWithADoubleAndUnit("/msc/gun/setGunEnergy",this);
+    gunEnergyCmd = new G4UIcmdWithADoubleAndUnit("/rad/gun/setGunEnergy",this);
     gunEnergyCmd->SetParameterName("gunEnergy", false);
 
-    tgtMatCmd = new G4UIcmdWithAString("/msc/det/setTargetMaterial",this);
+    tgtMatCmd = new G4UIcmdWithAString("/rad/det/setTargetMaterial",this);
     tgtMatCmd->SetParameterName("tgtMat", false);
 
 }
 
-mscMessenger::~mscMessenger(){
+radMessenger::~radMessenger(){
   delete nrDetCmd;
   delete gunEnergyCmd;
   delete tgtMatCmd;
 }
 
 
-void mscMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
+void radMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
 
   if( cmd == nrDetCmd ){
     G4int val = nrDetCmd->GetNewIntValue(newValue);
