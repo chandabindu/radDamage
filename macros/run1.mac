@@ -1,10 +1,16 @@
-### 
-#/rad/setNrUnits 30
+## 
+/rad/det/setNrDetectors 30
 
-## tungsten,lead,copper
-#/rad/det/setTargetmaterial tungsten
+# tungsten,lead,copper
+/rad/det/setTargetMaterial tungsten
 
-#/rad/gun/setGunEnergy 1 GeV
+#gun energy
+/rad/gun/setGunEnergy 1 GeV
+/rad/gun/setGunPosX 0 cm
+/rad/gun/setGunPosY 0 cm
+/rad/gun/setGunPosZ 0 cm
+
+/rad/det/updateGeometry
 
 /rad/event/setPrintModulo 1
 /run/beamOn 10
