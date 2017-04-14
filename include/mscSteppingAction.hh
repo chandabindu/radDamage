@@ -8,7 +8,7 @@
 #include "TH3I.h"
 #include "TTree.h"
 #include "TGraph.h"
-
+#include "neil.hh"
 
 class mscSteppingAction : public G4UserSteppingAction
 {
@@ -39,13 +39,16 @@ private:
   G4double  postE; // total energy
   G4double  postKE;// kinetic energy
   
-  G4double  postPosX; //position
-  G4double  postPosY;
-  G4double  postPosZ;
-  G4double  postMomX; //momentum
-  G4double  postMomY;
-  G4double  postMomZ;  
-
+  G4double  prePosX; //position
+  G4double  prePosY;
+  G4double  prePosZ;
+  G4double  preMomX; //momentum
+  G4double  preMomY;
+  G4double  preMomZ;  
+  G4double  neilVal;
+  G4double  normCosAng;
+  
+  neil neutronEquiv;
 };
 
 #endif

@@ -35,12 +35,15 @@ void  mscSteppingAction::InitOutput(){
   tout->Branch("postE",&postE,"postE/D");
   tout->Branch("postKE",&postKE,"postKE/D");
   
-  tout->Branch("postPosX", &postPosX, "postPosX/D");
-  tout->Branch("postPosY", &postPosY, "postPosY/D");
-  tout->Branch("postPosZ", &postPosZ, "postPosZ/D");
-  tout->Branch("postMomX", &postMomX, "postMomX/D");
-  tout->Branch("postMomY", &postMomY, "postMomY/D");
-  tout->Branch("postMomZ", &postMomZ, "postMomZ/D");
+  tout->Branch("prePosX", &prePosX, "prePosX/D");
+  tout->Branch("prePosY", &prePosY, "prePosY/D");
+  tout->Branch("prePosZ", &prePosZ, "prePosZ/D");
+  tout->Branch("preMomX", &preMomX, "preMomX/D");
+  tout->Branch("preMomY", &preMomY, "preMomY/D");
+  tout->Branch("preMomZ", &preMomZ, "preMomZ/D");
+
+  tout->Branch("neilVal", &neilVal, "neilVal/D");
+  tout->Branch("normCosAng", &normCosAng, "normCosAng/D");
   
 }
 
@@ -98,16 +101,28 @@ void mscSteppingAction::UserSteppingAction(const G4Step* theStep)
     trackID = theStep->GetTrack()->GetTrackID();
     parentID = theStep->GetTrack()->GetParentID();
   
-    postE  =  thePostPoint->GetTotalEnergy();
-    postKE = thePostPoint->GetKineticEnergy();
+    preE  =  thePrePoint->GetTotalEnergy();
+    preKE = thePostPoint->GetKineticEnergy();
 
-    postPosX  =  thePostPoint->GetPosition().getX();
-    postPosY  =  thePostPoint->GetPosition().getY();
-    postPosZ  =  thePostPoint->GetPosition().getZ();
-    postMomX  =  thePostPoint->GetMomentum().getX();
-    postMomY  =  thePostPoint->GetMomentum().getY();
-    postMomZ  =  thePostPoint->GetMomentum().getZ();
-    
+    prePosX  =  thePrePoint->GetPosition().getX();
+    prePosY  =  thePrePoint->GetPosition().getY();
+    prePosZ  =  thePrePoint->GetPosition().getZ();
+    preMomX  =  thePrePoint->GetMomentum().getX();
+    preMomY  =  thePrePoint->GetMomentum().getY();
+    preMomZ  =  thePrePoint->GetMomentum().getZ();
+
+    int nDmg(-1);
+    if(pType == 11 || pType == -11) nDmg=3;
+    else if(pType == 2112) nDmg=0;
+    else if(pType == 2212) nDmg=1;
+    else if(pType == 211 || pType == -211 || pType == 111) nDmg=2; 
+
+    if(nDmg!=-1)
+      neilVal = neutronEquiv.getNEIL(nDmg,preE);
+
+    G4ThreeVector globalMomentum = thePrePoint->GetMomentum();
+    G4ThreeVector localMomentum = thePrePoint->GetTouchable()->GetHistory()->GetTopTransform().TransformPoint(globalMomentum);
+    normCosAng = cos(localMomentum.getTheta());
   }
 
   if(fillTree){
@@ -123,15 +138,19 @@ void mscSteppingAction::InitVar(){
   parentID = -999;
   detID = -999;
   
-  postE  = -999;
-  postKE = -999;
+  preE  = -999;
+  preKE = -999;
 
-  postPosX  = -999;
-  postPosY  = -999;
-  postPosZ  = -999;
-  postMomX  = -999;
-  postMomY  = -999;
-  postMomZ  = -999;
+  prePosX  = -999;
+  prePosY  = -999;
+  prePosZ  = -999;
+  preMomX  = -999;
+  preMomY  = -999;
+  preMomZ  = -999;
+
+  neilVal  = -999;
+
+  normCosAng = -999;
 }
 
 
