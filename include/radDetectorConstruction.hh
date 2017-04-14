@@ -19,12 +19,11 @@ public:
 
   void SetNrDetectors( G4int val ){nrDet = val;}
   void SetTargetMaterial(std::string val){targetMaterial = val;}
+  void UpdateGeometry();
 
-private:
-  // methods
+private:  
   void DefineMaterials();  
-
-  // data members
+  
   G4int nrDet;
   std::string targetMaterial;
   G4bool  fCheckOverlaps; // option to activate checking of volumes overlaps

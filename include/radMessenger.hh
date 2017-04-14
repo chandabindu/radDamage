@@ -14,6 +14,7 @@ class G4UIcmdWithAnInteger;
 class G4UIcmdWithADoubleAndUnit;
 class G4UIcmdWithAString;
 class G4UIcmdWithABool;
+class G4UIcmdWithoutParameter;
 
 class radMessenger : public G4UImessenger {
 public:
@@ -36,6 +37,7 @@ private:
   G4UIcmdWithAnInteger *nrDetCmd;
   G4UIcmdWithAString *tgtMatCmd;
   G4UIcmdWithADoubleAndUnit *gunEnergyCmd;
+  G4UIcmdWithoutParameter *updateGeoCmd;
   
 };
 

@@ -4,6 +4,7 @@
 #include "G4UIcmdWithAString.hh"
 #include "G4UIcmdWithADoubleAndUnit.hh"
 #include "G4UIcmdWithABool.hh"
+#include "G4UIcmdWithoutParameter.hh"
 
 #include "radDetectorConstruction.hh"
 #include "radEventAction.hh"
@@ -23,8 +24,8 @@ radMessenger::radMessenger(){
     fPriGen       = NULL;
     fStepAct      = NULL;
 
-    nrDetCmd = new G4UIcmdWithAnInteger("/rad/det/setNrRadialDetectors",this);
-    nrDetCmd->SetGuidance("Set number of detectors in radial direction");
+    nrDetCmd = new G4UIcmdWithAnInteger("/rad/det/setNrDetectors",this);
+    nrDetCmd->SetGuidance("Set number of detectors");
     nrDetCmd->SetParameterName("nrDet", false);
 
     gunEnergyCmd = new G4UIcmdWithADoubleAndUnit("/rad/gun/setGunEnergy",this);
@@ -33,12 +34,14 @@ radMessenger::radMessenger(){
     tgtMatCmd = new G4UIcmdWithAString("/rad/det/setTargetMaterial",this);
     tgtMatCmd->SetParameterName("tgtMat", false);
 
+    updateGeoCmd = new G4UIcmdWithoutParameter("/rad/det/updateGeometry",this);    
 }
 
 radMessenger::~radMessenger(){
-  delete nrDetCmd;
-  delete gunEnergyCmd;
-  delete tgtMatCmd;
+  if(nrDetCmd) delete nrDetCmd;
+  if(gunEnergyCmd) delete gunEnergyCmd;
+  if(tgtMatCmd) delete tgtMatCmd;
+  if(updateGeoCmd) delete updateGeoCmd;
 }
 
 
@@ -52,6 +55,8 @@ void radMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
     fPriGen->SetGunEnergy( val );
   }else if( cmd == tgtMatCmd ){
     fDetCon->SetTargetMaterial( newValue );
+  }else if( cmd == updateGeoCmd ){
+    fDetCon->UpdateGeometry();
   }else{
     G4cerr << __PRETTY_FUNCTION__
 	   <<" what command are you talking about? "<<cmd<<" "<<newValue<<G4endl;
