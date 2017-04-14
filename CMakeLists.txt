@@ -63,7 +63,6 @@ set(MSC_SCRIPTS
   macros/init.mac
   macros/init_vis.mac
   macros/run1.mac
-  macros/run2.mac
   macros/vis.mac
   )
 
