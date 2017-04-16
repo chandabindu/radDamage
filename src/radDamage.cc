@@ -4,7 +4,7 @@
 
 using namespace std;
 
-/*E[GeV], theta[rad]*/
+/*E[MeV], theta[rad]*/
 double radDamage::getNEIL(int partType,double energy){
   //partType should be 0-4 representing (neutrons, protons, pions, e/p)
   if(partType<0 || partType>4){
@@ -25,7 +25,7 @@ double radDamage::getNEIL(int partType,double energy){
   return interpolatedValue;
 }
 
-/*E[GeV], theta[rad]*///FIXME
+/*E[MeV], theta[rad]*/
 double radDamage::getMREM(int partType, double energy, double theta){
   //partType should be 0-3 representing (neutrons, photons, e/p)
   if(partType<0 || partType>3){
@@ -34,7 +34,6 @@ double radDamage::getMREM(int partType, double energy, double theta){
     return -2;
   }
 
-  energy *= 1000; //This needs MeV
   double interpolatedValue = interpolate(xValMREM[partType],yValMREM[partType],energy);
   
   if(interpolatedValue < 0){
