@@ -60,15 +60,16 @@ double radDamage::interpolate(vector<double> xV, vector<double> yV,double energy
   if( energy <= xV.front() ) return yV.front();
   else if( energy >= xV.back() ) return yV.back();
   
-  int lowIndex  = int(lower_bound(xV.begin(),xV.end(),energy) - xV.begin() );
-  int highIndex = lowIndex+1;
+  int lowIndex  = int(lower_bound(xV.begin(),xV.end(),energy) - xV.begin() ) - 1;
+  int highIndex = lowIndex + 1;
 
   double lowVal  = yV[lowIndex];
   double highVal = yV[highIndex];
   double lowX  = xV[lowIndex];
   double highX = xV[highIndex];
 
-  return ( lowVal + (energy - lowX) * (highVal - lowVal) / (highX - lowX) );
+  double returnVal = ( lowVal + (energy - lowX) * (highVal - lowVal) / (highX - lowX) );  
+  return returnVal;
 }
 
 void radDamage::InitNEIL(){
