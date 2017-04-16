@@ -8,7 +8,7 @@
 #include "TH3I.h"
 #include "TTree.h"
 #include "TGraph.h"
-#include "neil.hh"
+#include "radDamage.hh"
 
 class radSteppingAction : public G4UserSteppingAction
 {
@@ -49,9 +49,10 @@ private:
   G4double  preMomY;
   G4double  preMomZ;  
   G4double  neilVal;
+  G4double  mremVal;
   G4double  normCosAng;
   
-  neil neutronEquiv;
+  radDamage dmgCalc;
 };
 
 #endif
