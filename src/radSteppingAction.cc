@@ -78,11 +78,13 @@ void radSteppingAction::UserSteppingAction(const G4Step* theStep)
     currentEv=eventNr;
   }
 
-  int fillTree=1;
+  int fillTree=0;
   
   if(theMaterial){    
-    if(theMaterial->GetName().compare("Galactic")==0)    material=1;
-    else if(theMaterial->GetName().compare("G4_W")==0 ||
+    if(theMaterial->GetName().compare("Galactic")==0){
+      material=1;
+      fillTree=1;
+    }else if(theMaterial->GetName().compare("G4_W")==0 ||
 	    theMaterial->GetName().compare("G4_Cu")==0 ||
 	    theMaterial->GetName().compare("G4_Pb")==0){
       material=0;
