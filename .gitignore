@@ -29,6 +29,7 @@
 *.root
 
 #output
+G4History.macro
 output
 o_*
 *.rndm

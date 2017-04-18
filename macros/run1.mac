@@ -12,5 +12,7 @@
 
 /rad/det/updateGeometry
 
+/random/setSeeds 345236 19652873
+
 /rad/event/setPrintModulo 1
 /run/beamOn 10

@@ -43,6 +43,7 @@ void  radSteppingAction::InitOutput(){
   tout->Branch("preMomZ", &preMomZ, "preMomZ/D");
 
   tout->Branch("neilVal", &neilVal, "neilVal/D");
+  tout->Branch("mremVal", &mremVal, "mremVal/D");
   tout->Branch("normCosAng", &normCosAng, "normCosAng/D");
   
 }
@@ -80,13 +81,13 @@ void radSteppingAction::UserSteppingAction(const G4Step* theStep)
   
   if(theMaterial){    
     if(theMaterial->GetName().compare("Galactic")==0){
-      fillTree=1;
       material=1;
-    } else if(theMaterial->GetName().compare("G4_W")==0 ||
-	    theMaterial->GetName().compare("G4_Cu")==0 ||
-	    theMaterial->GetName().compare("matFe")==0 ||
-	    theMaterial->GetName().compare("matW")==0 ||
-	    theMaterial->GetName().compare("G4_Pb")==0){
+      fillTree=1;
+    }else if(theMaterial->GetName().compare("G4_W")==0 ||
+	     theMaterial->GetName().compare("G4_Cu")==0 ||
+	     theMaterial->GetName().compare("matFe")==0 ||
+	     theMaterial->GetName().compare("matW")==0 ||
+	     theMaterial->GetName().compare("G4_Pb")==0){
       material=0;
       fillTree=0;
     }else fillTree=0;
@@ -118,11 +119,19 @@ void radSteppingAction::UserSteppingAction(const G4Step* theStep)
     else if(pType == 211 || pType == -211 || pType == 111) nDmg=2; 
 
     if(nDmg!=-1)
-      neilVal = neutronEquiv.getNEIL(nDmg,preE);
-
+      neilVal = dmgCalc.getNEIL(nDmg,preE);
+      
     G4ThreeVector globalMomentum = thePrePoint->GetMomentum();
     G4ThreeVector localMomentum = thePrePoint->GetTouchable()->GetHistory()->GetTopTransform().TransformPoint(globalMomentum);
     normCosAng = cos(localMomentum.getTheta());
+
+    if(pType==2112)
+      mremVal = dmgCalc.getMREM(0,preE,localMomentum.getTheta());
+    else if(pType==22)
+      mremVal = dmgCalc.getMREM(1,preE,localMomentum.getTheta());
+    else if(abs(pType)==11)
+      mremVal = dmgCalc.getMREM(2,preE,localMomentum.getTheta());
+
   }
 
   if(fillTree){
@@ -149,6 +158,7 @@ void radSteppingAction::InitVar(){
   preMomZ  = -999;
 
   neilVal  = -999;
+  mremVal  = -999;
 
   normCosAng = -999;
 }
