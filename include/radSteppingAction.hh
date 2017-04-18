@@ -36,8 +36,8 @@ private:
   
   G4int detID;
   
-  G4double  postE; // total energy
-  G4double  postKE;// kinetic energy
+  G4double  preE; // total energy
+  G4double  preKE;// kinetic energy
   
   G4double  prePosX; //position
   G4double  prePosY;

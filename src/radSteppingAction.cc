@@ -32,8 +32,8 @@ void  radSteppingAction::InitOutput(){
   tout->Branch("parentID",&parentID,"parentID/I");
   tout->Branch("detID",&detID,"detID/I");
   
-  tout->Branch("postE",&postE,"postE/D");
-  tout->Branch("postKE",&postKE,"postKE/D");
+  tout->Branch("preE",&preE,"preE/D");
+  tout->Branch("preKE",&preKE,"preKE/D");
   
   tout->Branch("prePosX", &prePosX, "prePosX/D");
   tout->Branch("prePosY", &prePosY, "prePosY/D");
