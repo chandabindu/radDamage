@@ -1,14 +1,11 @@
-## 
-/rad/det/setNrDetectors 30
-
-# tungsten,lead,copper
+# tungsten,iron
 /rad/det/setTargetMaterial tungsten
 
 #gun energy
-/rad/gun/setGunEnergy 1 GeV
+/rad/gun/setGunEnergy 11.5 GeV
 /rad/gun/setGunPosX 0 cm
 /rad/gun/setGunPosY 0 cm
-/rad/gun/setGunPosZ 0 cm
+/rad/gun/setGunPosZ -15 cm
 
 /rad/det/updateGeometry
 
