@@ -7,31 +7,37 @@ def main():
     gunX = 0.
     gunY = 0.
     gunZ = 0.
-    gunE=[1000,6000,11000]#MeV
+    gunE=[11500]#MeV
 
-    nrDet = 30
-    materials = ["tungsten","lead","copper"]
+    materials = ["tungsten","iron"]
 
     printInterval = 10000
     email="ciprian@jlab.org"
-    inpDir="/lustre/expphy/work/hallc/qweak/ciprian/simCodeG410/radDamage"
-    outDir="/lustre/expphy/volatile/hallc/qweak/ciprian/farmoutput/radDmg"
+    inpDir="/lustre/expphy/work/hallc/qweak/ciprian/simCodeG410/radDamagePS/radDamage"
+    outDir="/lustre/expphy/volatile/hallc/qweak/ciprian/farmoutput/pavelSphere"
 
     nEv=20000
-    nrStop=1000
+    nrStop=4
     nrStart=0
     submit=0
-
+    simulationCue="debug"
+    #simulationCue="simulation"
+    
     for energy in gunE:
         for mat in materials:
             for nr in range(nrStart,nrStop): # repeat for nr jobs
+                if mat is iron:
+                    gunZ = -15
+                else:
+                    gunZ = -30
+                    
                 idN= mat + '_%02dGeV'%(energy/1000)+'_%04d'% (nr) 
                 print idN
 
                 createMacFile(outDir,idN,nrDet,mat,gunX,gunY,gunZ,energy,nEv,nr,printInterval)
-                call(["cp",inpDir+"/build/radTest",outDir+"/radTest/"+idN+"/radTest"])
+                call(["cp",inpDir+"/build/radTest",outDir+"/"+idN+"/radTest"])
 
-            createXMLfile(inpDir,outDir,mat+'_%02dGeV'%(energy/1000),nrStart,nrStop,email)
+            createXMLfile(inpDir,outDir,mat+'_%02dGeV'%(energy/1000),nrStart,nrStop,email,simulationCue)
 
 
             if submit==1:
@@ -45,16 +51,15 @@ def main():
 def createMacFile(directory,idname,
                   nrDet,material,xPos,yPos,zPos,
                   beamE,nEv,nr,printInterval):
-    if not os.path.exists(directory+"/radTest/"+idname+"/log"):
-        os.makedirs(directory+"/radTest/"+idname+"/log")
+    if not os.path.exists(directory+"/"+idname+"/log"):
+        os.makedirs(directory+"/"+idname+"/log")
    
-    f=open(directory+"/radTest/"+idname+"/myRun.mac",'w')
-    f.write("/rad/det/setNrDetectors "+str(nrDet)+"\n")
+    f=open(directory+"/"+idname+"/myRun.mac",'w')
     f.write("/rad/det/setTargetMaterial "+material+" \n")
     f.write("/rad/gun/setGunPosX "+str(xPos)+" cm\n")
     f.write("/rad/gun/setGunPosY "+str(yPos)+" cm\n")
     f.write("/rad/gun/setGunPosZ "+str(zPos)+" cm\n")
-    f.write("/rad/gun/setGunEnergy "+str(beamE)+" MeV\n")
+    f.write("/rad/gun/setGunEnergy "+str(beamE/1000)+" GeV\n")
     f.write("/rad/det/updateGeometry\n")
     seedA=int(time.time())+   100*nr+nr
     seedB=int(time.time())*100+10*nr+nr
@@ -64,7 +69,7 @@ def createMacFile(directory,idname,
     f.close()
     return 0
 
-def createXMLfile(source,writeDir,idRoot,nStart,nStop,email):
+def createXMLfile(source,writeDir,idRoot,nStart,nStop,email,cue):
     
     if not os.path.exists(source+"/scripts/jobs"):
         os.makedirs(source+"/scripts/jobs")
@@ -73,8 +78,7 @@ def createXMLfile(source,writeDir,idRoot,nStart,nStop,email):
     f.write("<Request>\n")
     f.write("  <Email email=\""+email+"\" request=\"false\" job=\"true\"/>\n")
     f.write("  <Project name=\"qweak\"/>\n")
-#    f.write("  <Track name=\"debug\"/>\n")
-    f.write("  <Track name=\"simulation\"/>\n")
+    f.write("  <Track name=\""+cue+"\"/>\n")
     f.write("  <Name name=\""+idRoot+"\"/>\n")
     f.write("  <OS name=\"centos7\"/>\n")
     f.write("  <Command><![CDATA[\n")
@@ -84,7 +88,7 @@ def createXMLfile(source,writeDir,idRoot,nStart,nStop,email):
 
     for nr in range(nStart,nStop): # repeat for nr jobs
         f.write("  <Job>\n")
-        idName= writeDir+"/radTest/"+idRoot+'_%04d'%(nr)
+        idName= writeDir+"/"+idRoot+'_%04d'%(nr)
         f.write("    <Input src=\""+idName+"/radTest\" dest=\"radTest\"/>\n")
         f.write("    <Input src=\""+idName+"/myRun.mac\" dest=\"myRun.mac\"/>\n")
         f.write("    <Output src=\"o_radTree.root\" dest=\""+idName+"/o_radTree.root\"/>\n")
