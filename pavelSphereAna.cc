@@ -24,6 +24,7 @@ G4double preMomY, preMomZ, neilVal, mremVal, normCosAng;
 TFile *fout;
 const int nHist=6;
 //[6]== electron/positron, neutron, pion, gamma, proton, other
+map <int,int> histNr;//<pType,histNr>
 TH1D *hE[nHist],*hNEIL[nHist],*hMREM[nHist];
 const int nAverage=5000;
 TH1D *hAvgE[nHist],*hAvgNEIL[nHist],*hAvgMREM[nHist];
@@ -96,54 +97,30 @@ void processOne(string fnm){
 	    <<"\n\t\t"<<norm<<G4endl;
       theta=pi/2*1.01;	
     }
-    G4double val;
-    if(abs(pType)==11){
-      hE[0]->Fill(preKE);
-      avgE[0]+=preKE;
 
-      val = radDmg.getNEIL(pType,preKE)/abs(cos(theta));
-      hNEIL[0]->Fill(val);
-      avgN[0]+=val;
+    int nrHist(-1);
+    if( abs(pType) != 11 && abs(pType) != 211 && pType != 111 && pType != 2112 && pType != 2212 )
+      nrHist=5;
+    else
+      nrHist=histNr[pType];
 
-      val = radDmg.getMREM(pType,preKE,theta);
-      hMREM[0]->Fill(val);
-      avgM[0]+=val;
-    }else if(pType==2112){//neutrons
-      hE[1]->Fill(preKE);
-      avgE[1]+=preKE;
+    hE[nrHist]->Fill(preKE);
+    avgE[nrHist] += preKE;
 
-      val = radDmg.getNEIL(pType,preKE)/abs(cos(theta));
-      hNEIL[1]->Fill(val);
-      avgN[1]+=val;
-
-      val = radDmg.getMREM(pType,preKE,theta);
-      hMREM[1]->Fill(val);
-      avgM[1]+=val;
-    }else if(pType==2212){//protons
-      hE[4]->Fill(preKE);
-      avgE[4]+=preKE;
-
-      val = radDmg.getNEIL(pType,preKE)/abs(cos(theta));
-      hNEIL[4]->Fill(val);
-      avgN[4]+=val;
-    }else if(abs(pType)==22){//photons
-      hE[3]->Fill(preKE);
-      avgE[3]+=preKE;
-
-      val = radDmg.getMREM(pType,preKE,theta);
-      hMREM[3]->Fill(val);
-      avgM[3]+=val;
-    }else if(pType == 211 || pType == -211 || pType == 111){//pions
-      hE[2]->Fill(preKE);
-      avgE[2]+=preKE;
-
-      val = radDmg.getNEIL(pType,preKE)/abs(cos(theta));
-      hNEIL[2]->Fill(val);
-      avgN[2]+=val;
-    }else {
-      hE[5] -> Fill(preKE);
-      avgE[5] +=preKE;
+    double val(-1);
+    val = radDmg.getNEIL(pType,preKE);
+    if(val!=-999){
+      val /= abs(cos(theta));
+      hNEIL[nrHist]->Fill(val);
+      avgN[nrHist] += val;
     }
+
+    val = radDmg.getMREM(pType,preKE,theta);
+    if(val!=-999){
+      hMREM[nrHist]->Fill(val);
+      avgM[nrHist] += val;
+    }
+
   }
 
   processedEv += ceil(prevEv/1000.)*1000;
@@ -174,6 +151,15 @@ void Init(TTree *t){
 }
 
 void InitOutput(){
+  histNr[11]=0;
+  histNr[-11]=0;
+  histNr[2112]=1;
+  histNr[211]=2;
+  histNr[-211]=2;
+  histNr[111]=2;
+  histNr[22]=3;
+  histNr[2122]=4;
+
   fout=new TFile("o_psAna.root","RECREATE");
   string pNm[nHist]={"ep","n","pi","g","pr","o"};
   int nBin=400;
