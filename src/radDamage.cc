@@ -32,7 +32,7 @@ double radDamage::getNEIL(int partType,double energy){
   return interpolatedValue;
 }
 
-/*E[MeV], theta[rad]*/
+/*E[MeV], theta[rad] => mrem/s*/
 double radDamage::getMREM(int partType, double energy, double theta){
 
   int nDmg(-1);
@@ -60,9 +60,9 @@ double radDamage::getMREM(int partType, double energy, double theta){
   if(nDmg==0)
     interpolatedValue = 1e7*interpolatedValue/abs(cos(theta));
   else if(nDmg==1)
-    interpolatedValue = 1e7/(3600*interpolatedValue*abs(cos(theta)));
+    interpolatedValue = 1e7/(interpolatedValue*abs(cos(theta)));
   else
-    interpolatedValue = 1e7/(3600*interpolatedValue*abs(cos(theta)));
+    interpolatedValue = 1e7/(interpolatedValue*abs(cos(theta)));
   
   return interpolatedValue;
 }
