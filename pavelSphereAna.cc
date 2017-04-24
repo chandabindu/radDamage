@@ -11,7 +11,6 @@
 #include "radDamage.hh"
 #include "G4ThreeVector.hh"
 /*TODO
-  - add histograms for a small band around 90 degrees around z
   - add 2D heat map in phi and theta
  */
 
@@ -32,6 +31,8 @@ double avgE[nHist]={0,0,0,0,0,0};
 double avgN[nHist]={0,0,0,0,0,0};
 double avgM[nHist]={0,0,0,0,0,0};
 
+int restrictAna(0);
+
 radDamage radDmg;
 void InitOutput();
 void WriteOutput();
@@ -42,12 +43,13 @@ void processOne(string fnm);
 
 int main(int argc,char** argv) {
   
-  if(argc != 2){
-    cout<<"Usage: build/pavelSphereAna [file with list of rootfiles]"<<endl;
-    cout<<" for example: build/pavelSphereAna tungsten.lst"<<endl;
+  if(argc != 3){
+    cout<<"Usage: build/pavelSphereAna [file with list of rootfiles] [0/1 -- restrict analysis region to 90 deg around z?]"<<endl;
+    cout<<" for example: build/pavelSphereAna tungsten.lst 0"<<endl;
     return 1;
   }
   string inFile=argv[1];
+  restrictAna = atoi(argv[2]);
   InitOutput();
 
   ifstream ifile(inFile.c_str());  
@@ -87,8 +89,11 @@ void processOne(string fnm){
     }
 
     if(mat!=1) continue;
-    G4ThreeVector mom(preMomX,preMomY,preMomZ);
     G4ThreeVector norm(prePosX,prePosY,prePosZ);
+
+    if(restrictAna && abs(norm.getTheta()/(pi/2) -1) > 0.05) continue;
+    
+    G4ThreeVector mom(preMomX,preMomY,preMomZ);    
     G4double theta = mom.unit().angle(norm.unit());
     if( abs(theta/(pi/2) -1 )<0.01 ) {
       G4cout<<__LINE__<<"\t"<<__PRETTY_FUNCTION__
