@@ -10,6 +10,11 @@
 
 #include "radDamage.hh"
 #include "G4ThreeVector.hh"
+/*TODO
+  - add histograms for a small band around 90 degrees around z
+  - add 2D heat map in phi and theta
+ */
+
 
 using namespace std;
 
@@ -96,43 +101,43 @@ void processOne(string fnm){
       hE[0]->Fill(preKE);
       avgE[0]+=preKE;
 
-      val = radDmg.getNEIL(3,preKE)/abs(cos(theta));
+      val = radDmg.getNEIL(pType,preKE)/abs(cos(theta));
       hNEIL[0]->Fill(val);
       avgN[0]+=val;
 
-      val = radDmg.getMREM(2,preKE,theta);
+      val = radDmg.getMREM(pType,preKE,theta);
       hMREM[0]->Fill(val);
       avgM[0]+=val;
     }else if(pType==2112){//neutrons
       hE[1]->Fill(preKE);
       avgE[1]+=preKE;
 
-      val = radDmg.getNEIL(0,preKE)/abs(cos(theta));
+      val = radDmg.getNEIL(pType,preKE)/abs(cos(theta));
       hNEIL[1]->Fill(val);
       avgN[1]+=val;
 
-      val = radDmg.getMREM(0,preKE,theta);
+      val = radDmg.getMREM(pType,preKE,theta);
       hMREM[1]->Fill(val);
       avgM[1]+=val;
     }else if(pType==2212){//protons
       hE[4]->Fill(preKE);
       avgE[4]+=preKE;
 
-      val = radDmg.getNEIL(1,preKE)/abs(cos(theta));
+      val = radDmg.getNEIL(pType,preKE)/abs(cos(theta));
       hNEIL[4]->Fill(val);
       avgN[4]+=val;
     }else if(abs(pType)==22){//photons
       hE[3]->Fill(preKE);
       avgE[3]+=preKE;
 
-      val = radDmg.getMREM(2,preKE,theta);
+      val = radDmg.getMREM(pType,preKE,theta);
       hMREM[3]->Fill(val);
       avgM[3]+=val;
     }else if(pType == 211 || pType == -211 || pType == 111){//pions
       hE[2]->Fill(preKE);
       avgE[2]+=preKE;
 
-      val = radDmg.getNEIL(2,preKE)/abs(cos(theta));
+      val = radDmg.getNEIL(pType,preKE)/abs(cos(theta));
       hNEIL[2]->Fill(val);
       avgN[2]+=val;
     }else {
