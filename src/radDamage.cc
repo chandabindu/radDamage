@@ -6,8 +6,8 @@ using namespace std;
 
 /*E[MeV], theta[rad]*/
 double radDamage::getNEIL(int partType,double energy){
-  //partType should be 0-4 representing (neutrons, protons, pions, e/p)
-  if(partType<0 || partType>4){
+  //partType should be 0-3 representing (neutrons, protons, pions, e/p)
+  if(partType<0 || partType>3){
     cout<<__LINE__<<"\t"<<__PRETTY_FUNCTION__<<endl
 	<<"\tBad call of getNEIL(a,b); a can only be 0,1,2 or 3"<<endl;
     return -2;
