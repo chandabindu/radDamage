@@ -112,13 +112,12 @@ void radSteppingAction::UserSteppingAction(const G4Step* theStep)
     preMomY  =  thePrePoint->GetMomentum().getY();
     preMomZ  =  thePrePoint->GetMomentum().getZ();
 
-    neilVal = dmgCalc.getNEIL(pType,preKE);
-
     G4ThreeVector norm(prePosX,prePosY,prePosZ);
     G4ThreeVector mom(preMomX,preMomY,preMomZ);
     G4double theta = norm.unit().angle(mom.unit()); 
     normCosAng = cos(theta);
 
+    neilVal = dmgCalc.getNEIL(pType,preKE,theta);
     mremVal = dmgCalc.getMREM(pType,preKE,theta);
 
   }
