@@ -5,7 +5,7 @@
 using namespace std;
 
 /*E[MeV], theta[rad]*/
-double radDamage::getNEIL(int partType,double energy){
+double radDamage::getNEIL(int partType,double energy, double theta){
 
   int nDmg(-1);
   if(abs(partType) == 11){
@@ -19,8 +19,12 @@ double radDamage::getNEIL(int partType,double energy){
   }else{
     return -999;
   }
-  
+
   double interpolatedValue = interpolate(xValNEIL[nDmg],yValNEIL[nDmg],energy);
+
+  double pi=acos(-1);
+  if( abs(theta/(pi/2) - 1) < 0.01 ) theta=pi/2*1.01;
+  interpolatedValue /= abs(cos(theta));
   
   if(interpolatedValue < 0){
     cout<<__LINE__<<"\t"<<__PRETTY_FUNCTION__<<endl
@@ -46,7 +50,7 @@ double radDamage::getMREM(int partType, double energy, double theta){
     return -999;
   }
 
-  double interpolatedValue = interpolate(xValMREM[nDmg],yValMREM[nDmg],energy);
+  double interpolatedValue = interpolate(xValMREM[nDmg],yValMREM[nDmg],energy/1000);
   
   if(interpolatedValue < 0){
     cout<<__LINE__<<"\t"<<__PRETTY_FUNCTION__<<endl
@@ -54,20 +58,27 @@ double radDamage::getMREM(int partType, double energy, double theta){
 	<<"\t for nDmg "<<nDmg<<"\t and energy "<<energy<<endl;
     return -1;
   }
+
+  // if(partType==2112){
+  //   cout<<theta<<" "<<partType<<" "<<energy/1000<<endl;
+  //   cin.ignore();
+  // }
+
   double pi=acos(-1);
   if( abs(theta/(pi/2) - 1) < 0.01 ) theta=pi/2*1.01;
 
   if(nDmg==0)
-    interpolatedValue = 1e7*interpolatedValue/abs(cos(theta));
+    interpolatedValue = 1*interpolatedValue/abs(cos(theta));
   else if(nDmg==1)
-    interpolatedValue = 1e7/(3600*interpolatedValue*abs(cos(theta)));
+    interpolatedValue = 1/(3600*interpolatedValue*abs(cos(theta)));
   else
-    interpolatedValue = 1e7/(3600*interpolatedValue*abs(cos(theta)));
+    interpolatedValue = 1/(3600*interpolatedValue*abs(cos(theta)));
   
   return interpolatedValue;
 }
   
 double radDamage::interpolate(vector<double> xV, vector<double> yV,double energy){
+  //cout<<energy<<" "<<xV.front()<<" "<<xV.back()<<endl;
   if( energy <= xV.front() ) return yV.front();
   else if( energy >= xV.back() ) return yV.back();
   
@@ -78,8 +89,9 @@ double radDamage::interpolate(vector<double> xV, vector<double> yV,double energy
   double highVal = yV[highIndex];
   double lowX  = xV[lowIndex];
   double highX = xV[highIndex];
-
+  
   double returnVal = ( lowVal + (energy - lowX) * (highVal - lowVal) / (highX - lowX) );  
+  //cout<<"\t"<<lowX<<" "<<highX<<" "<<lowVal<<" "<<highVal<<" > "<<returnVal<<endl;
   return returnVal;
 }
 
