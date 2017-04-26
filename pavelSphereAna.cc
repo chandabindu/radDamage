@@ -5,15 +5,12 @@
 #include <fstream>
 
 #include "TH1D.h"
+#include "TH2D.h"
 #include "TFile.h"
 #include "TTree.h"
 
 #include "radDamage.hh"
 #include "G4ThreeVector.hh"
-/*TODO
-  - add 2D heat map in phi and theta
- */
-
 
 using namespace std;
 
@@ -26,11 +23,11 @@ const int nHist=6;
 map <int,int> histNr;//<pType,histNr>
 TH1D *hE[nHist],*hNEIL[nHist],*hMREM[nHist];
 const int nAverage=5000;
+TH2D *hNEILneutron, *hMREMneutron;
 TH1D *hAvgE[nHist],*hAvgNEIL[nHist],*hAvgMREM[nHist];
 double avgE[nHist]={0,0,0,0,0,0};
 double avgN[nHist]={0,0,0,0,0,0};
 double avgM[nHist]={0,0,0,0,0,0};
-
 int restrictAna(0);
 
 radDamage radDmg;
@@ -42,6 +39,9 @@ long currentEv(0),prevEv(0),processedEv(0);
 void processOne(string fnm);
 
 int main(int argc,char** argv) {
+  // radDamage calc;
+  // cout<<calc.getMREM(2112,10,0)<<endl;
+  // return 0;
   
   if(argc != 3){
     cout<<"Usage: build/pavelSphereAna [file with list of rootfiles] [0/1 -- restrict analysis region to 90 deg around z?]"<<endl;
@@ -58,8 +58,18 @@ int main(int argc,char** argv) {
     processOne(data);
   }
   cout<<"Total of "<<processedEv<<endl;
-  WriteOutput();
+  double gunEnergy = 11500;//[MeV]
+  double Wfactor = gunEnergy * 1e-13*(1.60218);//[J/s]
+  double areaDetector = 4 * acos(-1) * pow(300,2);//cm2
+  if(restrictAna)
+    areaDetector *= 0.1;
+  double factorAll = (3600*3*1e4)/ ( areaDetector * Wfactor );
+  cout<<"\tCompare to Pavel:\n"
+      <<"\t\tNeutron: NEIL = "<< factorAll * hAvgNEIL[histNr[2112]]->GetMean()<<"\tpm\t"<< factorAll *  hAvgNEIL[histNr[2112]]->GetMeanError()<<"\t[NEIL/h/cm2]"<<endl
+      <<"\t\tNeutron: MREM = "<< factorAll * hAvgMREM[histNr[2112]]->GetMean()<<"\tpm\t"<< factorAll * hAvgMREM[histNr[2112]]->GetMeanError()<<"\t[mrem/h/cm2]"<<endl;
   
+  WriteOutput();
+
   return 0; 
 }
  
@@ -113,24 +123,25 @@ void processOne(string fnm){
     avgE[nrHist] += preKE;
 
     double val(-1);
-    val = radDmg.getNEIL(pType,preKE);
+    val = radDmg.getNEIL(pType,preKE,theta);
     if(val!=-999){
-      val /= abs(cos(theta));
       hNEIL[nrHist]->Fill(val);
       avgN[nrHist] += val;
+      if(pType==2112)
+	hNEILneutron->Fill(norm.getPhi()*180/pi,norm.getTheta()*180/pi,val);
     }
 
     val = radDmg.getMREM(pType,preKE,theta);
     if(val!=-999){
       hMREM[nrHist]->Fill(val);
       avgM[nrHist] += val;
+      if(pType==2112){
+	hMREMneutron->Fill(norm.getPhi()*180/pi,norm.getTheta()*180/pi,val);
+      }
     }
-
   }
 
   processedEv += ceil(prevEv/1000.)*1000;
-  // cout<<processedEv<<" "<<prevEv<<endl;
-  // cin.ignore();
   prevEv = 0;
   fin->Close();
   delete fin;
@@ -172,6 +183,12 @@ void InitOutput(){
   int ehBin[nHist]={50 ,700,100,10,700,10};
   int nhBin[nHist]={ 1 , 50,100,10,100,10};
   int mhBin[nHist]={10000,10000,10,10, 10,10};
+  hNEILneutron = new TH2D("hNEILneutron","NEIL value;#phi [deg]; #theta [deg];",
+			  360,-180,180,
+			  180,0,180);
+  hMREMneutron = new TH2D("hMREMneutron","MREM value;#phi [deg]; #theta [deg];",
+			  360,-180,180,
+			  180,0,180);
   for(int i=0;i<nHist;i++){
     hE[i]=new TH1D(Form("hE_%s",pNm[i].c_str()),";Energy [MeV]",
 		   nBin,elBin[i],ehBin[i]);
@@ -197,6 +214,8 @@ void InitOutput(){
 
 void WriteOutput(){
   fout->cd();
+  hNEILneutron->Write();
+  hMREMneutron->Write();
   for(int i=0;i<nHist;i++){
     hE[i]->Write();
     hNEIL[i]->Write();
