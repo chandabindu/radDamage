@@ -1,6 +1,7 @@
 #include "radSteppingAction.hh"
 
 #include "G4SteppingManager.hh"
+#include "G4TransportationManager.hh"
 #include "G4Track.hh"
 #include "G4Step.hh"
 #include "G4StepPoint.hh"
@@ -112,11 +113,16 @@ void radSteppingAction::UserSteppingAction(const G4Step* theStep)
     preMomY  =  thePrePoint->GetMomentum().getY();
     preMomZ  =  thePrePoint->GetMomentum().getZ();
 
-    G4ThreeVector norm(prePosX,prePosY,prePosZ);
     G4ThreeVector mom(preMomX,preMomY,preMomZ);
-    G4double theta = norm.unit().angle(mom.unit()); 
-    normCosAng = cos(theta);
-
+    G4bool valid;
+    G4double theta(0);
+    if(material==1){
+      G4ThreeVector norm = G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking()->GetGlobalExitNormal(thePostPoint->GetPosition(),&valid);      
+      theta = norm.angle(mom.unit());
+    }
+    if(valid)
+      normCosAng = cos(theta);
+    
     neilVal = dmgCalc.getNEIL(pType,preKE,theta);
     mremVal = dmgCalc.getMREM(pType,preKE,theta);
 
