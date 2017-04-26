@@ -49,8 +49,8 @@ double radDamage::getMREM(int partType, double energy, double theta){
   }else{
     return -999;
   }
-
-  double interpolatedValue = interpolate(xValMREM[nDmg],yValMREM[nDmg],energy/1000);
+  //Tables are in MeV
+  double interpolatedValue = interpolate(xValMREM[nDmg],yValMREM[nDmg],energy);
   
   if(interpolatedValue < 0){
     cout<<__LINE__<<"\t"<<__PRETTY_FUNCTION__<<endl
@@ -58,11 +58,6 @@ double radDamage::getMREM(int partType, double energy, double theta){
 	<<"\t for nDmg "<<nDmg<<"\t and energy "<<energy<<endl;
     return -1;
   }
-
-  // if(partType==2112){
-  //   cout<<theta<<" "<<partType<<" "<<energy/1000<<endl;
-  //   cin.ignore();
-  // }
 
   double pi=acos(-1);
   if( abs(theta/(pi/2) - 1) < 0.01 ) theta=pi/2*1.01;
@@ -78,7 +73,6 @@ double radDamage::getMREM(int partType, double energy, double theta){
 }
   
 double radDamage::interpolate(vector<double> xV, vector<double> yV,double energy){
-  //cout<<energy<<" "<<xV.front()<<" "<<xV.back()<<endl;
   if( energy <= xV.front() ) return yV.front();
   else if( energy >= xV.back() ) return yV.back();
   
@@ -91,7 +85,6 @@ double radDamage::interpolate(vector<double> xV, vector<double> yV,double energy
   double highX = xV[highIndex];
   
   double returnVal = ( lowVal + (energy - lowX) * (highVal - lowVal) / (highX - lowX) );  
-  //cout<<"\t"<<lowX<<" "<<highX<<" "<<lowVal<<" "<<highVal<<" > "<<returnVal<<endl;
   return returnVal;
 }
 
