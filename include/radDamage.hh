@@ -18,8 +18,8 @@ public:
   radDamage(){InitNEIL();InitMREM();};
   ~radDamage(){};
 
-  double getNEIL(int partType,double energy);  
-  double getMREM(int partType,double energy,double theta);  
+  double getNEIL(int partType,double energy,double theta=0);  
+  double getMREM(int partType,double energy,double theta=0);  
   
 };
 
