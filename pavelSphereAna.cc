@@ -21,7 +21,7 @@ TFile *fout;
 const int nHist=6;
 //[6]== electron/positron, neutron, pion, gamma, proton, other
 map <int,int> histNr;//<pType,histNr>
-TH1D *hE[nHist],*hNEIL[nHist],*hMREM[nHist];
+TH1D *hE[nHist],*hNEIL[nHist],*hMREM[nHist],*hElog[nHist];
 const int nAverage=5000;
 TH2D *hNEILneutron, *hMREMneutron;
 TH1D *hAvgE[nHist],*hAvgNEIL[nHist],*hAvgMREM[nHist];
@@ -120,6 +120,7 @@ void processOne(string fnm){
       nrHist=histNr[pType];
 
     hE[nrHist]->Fill(preKE);
+    hElog[nrHist]->Fill(log10(preKE));
     avgE[nrHist] += preKE;
 
     double val(-1);
@@ -192,6 +193,8 @@ void InitOutput(){
   for(int i=0;i<nHist;i++){
     hE[i]=new TH1D(Form("hE_%s",pNm[i].c_str()),";Energy [MeV]",
 		   nBin,elBin[i],ehBin[i]);
+    hElog[i]=new TH1D(Form("hElog_%s",pNm[i].c_str()),";log10(Energy/MeV)",
+		      nBin,-7,3.5);
     hNEIL[i]=new TH1D(Form("hNEIL_%s",pNm[i].c_str()),";1MeV neutron equivalent",
 		      nBin,elBin[i],nhBin[i]);
     hMREM[i]=new TH1D(Form("hMREM_%s",pNm[i].c_str()),";dose [mrem]",
@@ -218,6 +221,7 @@ void WriteOutput(){
   hMREMneutron->Write();
   for(int i=0;i<nHist;i++){
     hE[i]->Write();
+    hElog[i]->Write();
     hNEIL[i]->Write();
     hMREM[i]->Write();
     hAvgE[i]->Write();
