@@ -23,7 +23,7 @@ const int nHist=6;
 map <int,int> histNr;//<pType,histNr>
 TH1D *hE[nHist],*hNEIL[nHist],*hMREM[nHist],*hElog[nHist];
 const int nAverage=5000;
-TH2D *hNEILneutron, *hMREMneutron;
+TH2D *hNEILneutron, *hMREMneutron, *hCorrMREMlogE;
 TH1D *hAvgE[nHist],*hAvgNEIL[nHist],*hAvgMREM[nHist];
 double avgE[nHist]={0,0,0,0,0,0};
 double avgN[nHist]={0,0,0,0,0,0};
@@ -38,11 +38,7 @@ void Init(TTree *t);
 long currentEv(0),prevEv(0),processedEv(0);
 void processOne(string fnm);
 
-int main(int argc,char** argv) {
-  // radDamage calc;
-  // cout<<calc.getMREM(2112,10,0)<<endl;
-  // return 0;
-  
+int main(int argc,char** argv) {  
   if(argc != 3){
     cout<<"Usage: build/pavelSphereAna [file with list of rootfiles] [0/1 -- restrict analysis region to 90 deg around z?]"<<endl;
     cout<<" for example: build/pavelSphereAna tungsten.lst 0"<<endl;
@@ -128,8 +124,9 @@ void processOne(string fnm){
     if(val!=-999){
       hNEIL[nrHist]->Fill(val);
       avgN[nrHist] += val;
-      if(pType==2112)
+      if(pType==2112){
 	hNEILneutron->Fill(norm.getPhi()*180/pi,norm.getTheta()*180/pi,val);
+      }
     }
 
     val = radDmg.getMREM(pType,preKE,theta);
@@ -138,6 +135,7 @@ void processOne(string fnm){
       avgM[nrHist] += val;
       if(pType==2112){
 	hMREMneutron->Fill(norm.getPhi()*180/pi,norm.getTheta()*180/pi,val);
+	hCorrMREMlogE->Fill(log10(val),log10(preKE));
       }
     }
   }
@@ -180,21 +178,24 @@ void InitOutput(){
   fout=new TFile("o_psAna.root","RECREATE");
   string pNm[nHist]={"ep","n","pi","g","pr","o"};
   int nBin=400;
-  int elBin[nHist]={ 0 ,  0, 0, 0,  0, 0};
-  int ehBin[nHist]={50 ,700,100,10,700,10};
-  int nhBin[nHist]={ 1 , 50,100,10,100,10};
-  int mhBin[nHist]={10000,10000,10,10, 10,10};
+  int    elBin[nHist]={   0,   0,  0, 0,  0, 0};
+  int    ehBin[nHist]={ 300, 500,100,10,700,10};
+  int    nhBin[nHist]={   3,  50,100,10,100,10};
+  double mhBin[nHist]={2e-3,1e-3, 10,10, 10,10};
   hNEILneutron = new TH2D("hNEILneutron","NEIL value;#phi [deg]; #theta [deg];",
 			  360,-180,180,
 			  180,0,180);
   hMREMneutron = new TH2D("hMREMneutron","MREM value;#phi [deg]; #theta [deg];",
 			  360,-180,180,
 			  180,0,180);
+  hCorrMREMlogE = new TH2D("hCorrMREMlogE","neutrons ;log10(rad Damage/mRem); log10(KE/MeV);",
+			  nBin,-7,-2,
+			  nBin,-8,3.5);
   for(int i=0;i<nHist;i++){
     hE[i]=new TH1D(Form("hE_%s",pNm[i].c_str()),";Energy [MeV]",
 		   nBin,elBin[i],ehBin[i]);
-    hElog[i]=new TH1D(Form("hElog_%s",pNm[i].c_str()),";log10(Energy/MeV)",
-		      nBin,-7,3.5);
+    hElog[i]=new TH1D(Form("hElog_%s",pNm[i].c_str()),";log10(KE/MeV)",
+		      nBin,-8,3.5);
     hNEIL[i]=new TH1D(Form("hNEIL_%s",pNm[i].c_str()),";1MeV neutron equivalent",
 		      nBin,elBin[i],nhBin[i]);
     hMREM[i]=new TH1D(Form("hMREM_%s",pNm[i].c_str()),";dose [mrem]",
@@ -219,6 +220,7 @@ void WriteOutput(){
   fout->cd();
   hNEILneutron->Write();
   hMREMneutron->Write();
+  hCorrMREMlogE->Write();
   for(int i=0;i<nHist;i++){
     hE[i]->Write();
     hElog[i]->Write();
