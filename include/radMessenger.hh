@@ -34,7 +34,6 @@ private:
   radPrimaryGeneratorAction *fPriGen;
   radSteppingAction *fStepAct;
 
-  G4UIcmdWithAnInteger *nrDetCmd;
   G4UIcmdWithAString *tgtMatCmd;
   G4UIcmdWithADoubleAndUnit *gunEnergyCmd;
   G4UIcmdWithADoubleAndUnit *gunPosXCmd;

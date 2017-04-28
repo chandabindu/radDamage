@@ -24,10 +24,6 @@ radMessenger::radMessenger(){
     fPriGen       = NULL;
     fStepAct      = NULL;
 
-    nrDetCmd = new G4UIcmdWithAnInteger("/rad/det/setNrDetectors",this);
-    nrDetCmd->SetGuidance("Set number of detectors");
-    nrDetCmd->SetParameterName("nrDet", false);
-
     gunEnergyCmd = new G4UIcmdWithADoubleAndUnit("/rad/gun/setGunEnergy",this);
     gunEnergyCmd->SetParameterName("gunEnergy", false);
 
@@ -47,7 +43,6 @@ radMessenger::radMessenger(){
 }
 
 radMessenger::~radMessenger(){
-  if(nrDetCmd) delete nrDetCmd;
   if(gunEnergyCmd) delete gunEnergyCmd;
   if(gunPosXCmd) delete gunPosXCmd;
   if(gunPosYCmd) delete gunPosYCmd;
@@ -59,10 +54,7 @@ radMessenger::~radMessenger(){
 
 void radMessenger::SetNewValue(G4UIcommand* cmd, G4String newValue){
 
-  if( cmd == nrDetCmd ){
-    G4int val = nrDetCmd->GetNewIntValue(newValue);
-    fDetCon -> SetNrDetectors( val );
-  }else if( cmd == gunEnergyCmd ){
+  if( cmd == gunEnergyCmd ){
     G4double val = gunEnergyCmd->GetNewDoubleValue(newValue);
     fPriGen->SetGunEnergy( val );
   }else if( cmd == gunPosXCmd ){
