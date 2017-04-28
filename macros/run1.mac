@@ -1,8 +1,5 @@
-## 
-/rad/det/setNrDetectors 30
-
-# tungsten,lead,copper
-/rad/det/setTargetMaterial tungsten
+# lead, copper, calcium
+/rad/det/setTargetMaterial lead
 
 #gun energy
 /rad/gun/setGunEnergy 1 GeV
@@ -14,5 +11,5 @@
 
 /random/setSeeds 345236 19652873
 
-/rad/event/setPrintModulo 1
-/run/beamOn 10
+/rad/event/setPrintModulo 1000
+/run/beamOn 10000
