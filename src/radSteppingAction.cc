@@ -114,26 +114,18 @@ void radSteppingAction::UserSteppingAction(const G4Step* theStep)
     preMomY  =  thePrePoint->GetMomentum().getY();
     preMomZ  =  thePrePoint->GetMomentum().getZ();
 
-    int nDmg(-1);
-    if(pType == 11 || pType == -11) nDmg=3;
-    else if(pType == 2112) nDmg=0;
-    else if(pType == 2212) nDmg=1;
-    else if(pType == 211 || pType == -211 || pType == 111) nDmg=2; 
-
-    if(nDmg!=-1)
-      neilVal = dmgCalc.getNEIL(nDmg,preE);
-      
-    G4ThreeVector globalMomentum = thePrePoint->GetMomentum();
-    G4ThreeVector localMomentum = thePrePoint->GetTouchable()->GetHistory()->GetTopTransform().TransformPoint(globalMomentum);
-    normCosAng = cos(localMomentum.getTheta());
-
-    if(pType==2112)
-      mremVal = dmgCalc.getMREM(0,preE,localMomentum.getTheta());
-    else if(pType==22)
-      mremVal = dmgCalc.getMREM(1,preE,localMomentum.getTheta());
-    else if(abs(pType)==11)
-      mremVal = dmgCalc.getMREM(2,preE,localMomentum.getTheta());
-
+    G4ThreeVector mom(preMomX,preMomY,preMomZ);
+    G4bool valid(false);
+    G4double theta(0);
+    if(material==1){
+      G4ThreeVector norm = G4TransportationManager::GetTransportationManager()->GetNavigatorForTracking()->GetGlobalExitNormal(thePostPoint->GetPosition(),&valid);      
+      theta = norm.angle(mom.unit());
+    }
+    if(valid)
+      normCosAng = cos(theta);
+    
+    neilVal = dmgCalc.getNEIL(pType,preKE,theta);
+    mremVal = dmgCalc.getMREM(pType,preKE,theta);
   }
 
   if(fillTree){

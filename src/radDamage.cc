@@ -5,52 +5,69 @@
 using namespace std;
 
 /*E[MeV], theta[rad]*/
-double radDamage::getNEIL(int partType,double energy){
-  //partType should be 0-4 representing (neutrons, protons, pions, e/p)
-  if(partType<0 || partType>4){
-    cout<<__LINE__<<"\t"<<__PRETTY_FUNCTION__<<endl
-	<<"\tBad call of getNEIL(a,b); a can only be 0,1,2 or 3"<<endl;
-    return -2;
+double radDamage::getNEIL(int partType,double energy, double theta){
+
+  int nDmg(-1);
+  if(abs(partType) == 11){
+    nDmg=3;
+  }else if(partType == 2112){
+    nDmg=0;   
+  }else if(partType == 2212){
+    nDmg=1;
+  }else if(partType == 211 || partType == -211 || partType == 111){
+    nDmg=2;
+  }else{
+    return -999;
   }
-  
-  double interpolatedValue = interpolate(xValNEIL[partType],yValNEIL[partType],energy);
+
+  double interpolatedValue = interpolate(xValNEIL[nDmg],yValNEIL[nDmg],energy);
+
+  double pi=acos(-1);
+  if( abs(theta/(pi/2) - 1) < 0.01 ) theta=pi/2*1.01;
+  interpolatedValue /= abs(cos(theta));
   
   if(interpolatedValue < 0){
     cout<<__LINE__<<"\t"<<__PRETTY_FUNCTION__<<endl
 	<<"\tNegative interpolated value: "<<interpolatedValue
-	<<"\t for partType "<<partType<<"\t and energy "<<energy<<endl;
+	<<"\t for nDmg "<<nDmg<<"\t and energy "<<energy<<endl;
     return -1;
   }
   
   return interpolatedValue;
 }
 
-/*E[MeV], theta[rad]*/
+/*E[MeV], theta[rad] => mrem*/
 double radDamage::getMREM(int partType, double energy, double theta){
-  //partType should be 0-3 representing (neutrons, photons, e/p)
-  if(partType<0 || partType>3){
-    cout<<__LINE__<<"\t"<<__PRETTY_FUNCTION__<<endl
-	<<"\tBad call of getNEIL(a,b,c); a can only be 0,1, or 2"<<endl;
-    return -2;
-  }
 
-  double interpolatedValue = interpolate(xValMREM[partType],yValMREM[partType],energy);
+  int nDmg(-1);
+  if(abs(partType) == 11){
+    nDmg=2;
+  }else if(partType == 2112){
+    nDmg=0;   
+  }else if(partType == 22){
+    nDmg=1;
+  }else{
+    return -999;
+  }
+  //Tables are in MeV
+  double interpolatedValue = interpolate(xValMREM[nDmg],yValMREM[nDmg],energy);
   
   if(interpolatedValue < 0){
     cout<<__LINE__<<"\t"<<__PRETTY_FUNCTION__<<endl
 	<<"\tNegative interpolated value: "<<interpolatedValue
-	<<"\t for partType "<<partType<<"\t and energy "<<energy<<endl;
+	<<"\t for nDmg "<<nDmg<<"\t and energy "<<energy<<endl;
     return -1;
   }
+
   double pi=acos(-1);
   if( abs(theta/(pi/2) - 1) < 0.01 ) theta=pi/2*1.01;
 
-  if(partType==0)
-    interpolatedValue = 1e7*interpolatedValue/abs(cos(theta));
-  else if(partType==1)
-    interpolatedValue = 1e7/(3600*interpolatedValue*abs(cos(theta)));
+  if(nDmg==0)
+    interpolatedValue = 1*interpolatedValue/abs(cos(theta));
+  else if(nDmg==1)
+    interpolatedValue = 1/(3600*interpolatedValue*abs(cos(theta)));
   else
-    interpolatedValue = 1e7/(3600*interpolatedValue*abs(cos(theta)));
+    interpolatedValue = 1/(3600*interpolatedValue*abs(cos(theta)));
   
   return interpolatedValue;
 }
@@ -66,7 +83,7 @@ double radDamage::interpolate(vector<double> xV, vector<double> yV,double energy
   double highVal = yV[highIndex];
   double lowX  = xV[lowIndex];
   double highX = xV[highIndex];
-
+  
   double returnVal = ( lowVal + (energy - lowX) * (highVal - lowVal) / (highX - lowX) );  
   return returnVal;
 }
