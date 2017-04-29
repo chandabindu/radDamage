@@ -120,9 +120,9 @@ G4VPhysicalVolume* radDetectorConstruction::Construct(){
   //Target
   //default is copper
   G4double tgtR = 5 * cm, tgtLen=2*cm;
-  if(tgtMaterial == "lead"){
+  if(targetMaterial == "lead"){
     tgtLen = 0.5*cm;
-  }else if(tgtMaterial == "calcium"){
+  }else if(targetMaterial == "calcium"){
     tgtLen = 0.6*cm;    
   }
 
