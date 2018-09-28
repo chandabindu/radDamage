@@ -1,6 +1,6 @@
 void compareFeW(){
-  TFile *fi=TFile::Open("o_psAna_iron_242e5Ev.root","READ");
-  TFile *ft=TFile::Open("o_psAna_tungsten_242e5Ev.root","READ");
+  TFile *fi=TFile::Open("../o_psAna_iron_242e5Ev_fullDet.root","READ");
+  TFile *ft=TFile::Open("../o_psAna_tungsten_242e5Ev_fullDet.root","READ");
 
   gStyle->SetOptStat("neMRoui");
 
