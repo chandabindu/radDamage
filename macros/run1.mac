@@ -1,5 +1,5 @@
 # tungsten,iron
-/rad/det/setTargetMaterial tungsten
+/rad/det/setTargetMaterial iron
 
 #gun energy
 /rad/gun/setGunEnergy 11.5 GeV
@@ -11,5 +11,5 @@
 
 /random/setSeeds 345236 19652873
 
-/rad/event/setPrintModulo 1
-/run/beamOn 10
+/rad/event/setPrintModulo 1000
+/run/beamOn 1000
